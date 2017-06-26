@@ -1,0 +1,41 @@
+{
+  "name": "module-writer",
+  "version": "0.0.1",
+  "description": "Write JS objects and functions to Node module files.",
+  "author": "Phillip Smith <smithpr.unc@gmail.com>",
+  "contributors": [],
+  "scripts": {
+    "test": "",
+    "start": "",
+    "prepublish": ""
+  },
+  "files": [
+    "readme.md",
+    "index.js",
+    "lib/"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [
+      "module",
+      "fs",
+      "generator",
+      "json"
+  ],
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+  },
+  "private": true,
+  "publishConfig": {
+    "registry": ""
+  },
+  "license": "MIT"
+}

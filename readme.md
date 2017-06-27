@@ -115,3 +115,16 @@ module.exports = { greeter };
 ### Specifying options:
 
 You can pass an options object as the last argument to writeModule, createModule, or Module.writeToFile.
+
+
+Caveats
+-------
+
+* Variables and exports must be either functions, or types which can be expressed literally.  Those types are primitives (strings, chars, numbers, symbols, booleans, regular expressions, null, undefined), boxed primitives (Number, Boolean, etc), literal objects, Arrays with numeric keys.  *However, these objects can be nested, and functions can return any type on the module's scope.*
+* This package only works in Node.js, not browsers.
+
+
+Future plans
+------------
+
+* Add support for non-standard keys and property descriptors through IIFE substitution.

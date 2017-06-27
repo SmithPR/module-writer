@@ -57,7 +57,7 @@ class Module {
     addVar(varName, expr){
 
     }
-    exportVars(Vars){
+    exportVars(vars){
 
     }
     writeToFile(filename, callback){

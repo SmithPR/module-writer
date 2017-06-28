@@ -86,20 +86,38 @@ describe('lib/stringify.js', function(){
             });
         });
 
+        describe('object', function(){
+            it('Correctly stringifies simple objects', function(){
+                assert.equal('{ a: 1, b: \'foo\', c: null }', stringify({ a: 1, b: 'foo', c: null }));
+            });
+            
+            it('Breaks long objects onto multiple lines', function(){
+                let orig = {
+                    stringProp: 'What a long string this is!  Especially if it keeps going...',
+                    numProp: 1234567890,
+                    RegExpProp: /^"[a-zA-Z_][a-zA-Z_0-9]*"$/
+                };
+                let expected = '{' +
+                    `\r\n\tstringProp: 'What a long string this is!  Especially if it keeps going...',`+
+                    `\r\n\tnumProp: 1234567890,`+
+                    `\r\n\tRegExpProp: /^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
+                '\r\n}';
+                assert.equal(stringify(orig), expected);
+            });
+        });
+
         describe('Arrays', function(){
-            var orig;
-            var expected;
             it('Correctly stringifies simple arrays', function(){
                 assert.equal('[ 1, \'foo\', null ]', stringify([ 1, 'foo', null ]));
             });
             
             it('Breaks long arrays onto multiple lines', function(){
-                orig = [
+                let orig = [
                     'What a long string this is!  Especially if it keeps going...',
                     1234567890,
                     /^"[a-zA-Z_][a-zA-Z_0-9]*"$/
                 ];
-                expected = '[' +
+                let expected = '[' +
                     `\r\n\t'What a long string this is!  Especially if it keeps going...',`+
                     `\r\n\t1234567890,`+
                     `\r\n\t/^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+

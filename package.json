@@ -5,7 +5,7 @@
   "author": "Phillip Smith <smithpr.unc@gmail.com>",
   "contributors": [],
   "scripts": {
-    "test": "",
+    "test": "mocha",
     "start": "",
     "prepublish": ""
   },
@@ -23,15 +23,16 @@
     "url": ""
   },
   "keywords": [
-      "module",
-      "fs",
-      "generator",
-      "json"
+    "module",
+    "fs",
+    "generator",
+    "json"
   ],
   "dependencies": {
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "mocha": "^3.4.2"
   },
   "private": true,
   "publishConfig": {

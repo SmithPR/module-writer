@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var stringify = require('../lib/stringify.js');
 
@@ -64,6 +66,26 @@ describe('lib/stringify.js', function(){
             });
         });
 
+        describe('functions', function(){
+            let orig = function(a, b){
+                if(a > b) return 1;
+                else if(a === b) return 0;
+                else return -1;
+            };
+            let expected = 'function (a, b){'+
+                '\r\n    if(a > b) return 1;'+
+                '\r\n    else if(a === b) return 0;'+
+                '\r\n    else return -1;'+
+                '\r\n}';
+            let output = stringify(orig);
+            it('Correctly stringifies functions', function(){
+                assert.equal(output, expected);
+            });
+            it('Stringified functions work properly', function(){
+                assert.equal(0, (eval(`(${output})`))(5, 5));
+            });
+        });
+
         describe('Arrays', function(){
             var orig;
             var expected;
@@ -78,10 +100,10 @@ describe('lib/stringify.js', function(){
                     /^"[a-zA-Z_][a-zA-Z_0-9]*"$/
                 ];
                 expected = '[' +
-                    `\n\t'What a long string this is!  Especially if it keeps going...',`+
-                    `\n\t1234567890,`+
-                    `\n\t/^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
-                '\n]';
+                    `\r\n\t'What a long string this is!  Especially if it keeps going...',`+
+                    `\r\n\t1234567890,`+
+                    `\r\n\t/^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
+                '\r\n]';
                 assert.equal(stringify(orig), expected);
             });
         });

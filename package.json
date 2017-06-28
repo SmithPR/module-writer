@@ -6,6 +6,7 @@
   "contributors": [],
   "scripts": {
     "test": "mocha",
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
     "start": "",
     "prepublish": ""
   },
@@ -32,6 +33,7 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "istanbul": "^0.4.5",
     "mocha": "^3.4.2"
   },
   "private": true,

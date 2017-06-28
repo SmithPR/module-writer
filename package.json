@@ -7,6 +7,7 @@
   "scripts": {
     "test": "mocha",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
+    "report-coverage": "npm run coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls",
     "start": "",
     "prepublish": ""
   },
@@ -33,8 +34,10 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "coveralls": "^2.13.1",
     "istanbul": "^0.4.5",
-    "mocha": "^3.4.2"
+    "mocha": "^3.4.2",
+    "mocha-lcov-reporter": "^1.3.0"
   },
   "private": true,
   "publishConfig": {

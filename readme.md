@@ -7,6 +7,8 @@ Node.js: Module-writer
 
 `module-writer` is a simple, lightweight utility for code generation.
 
+[![build status](https://travis-ci.org/SmithPR/module-writer.svg?branch=master)](https://travis-ci.org/SmithPR/module-writer)
+[![Coverage Status](https://coveralls.io/repos/github/SmithPR/module-writer/badge.svg?branch=master)](https://coveralls.io/github/SmithPR/module-writer?branch=master)
 
 What can I do with this?
 ---

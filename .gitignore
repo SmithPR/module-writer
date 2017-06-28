@@ -5,4 +5,5 @@ node_modules
 # Optional npm cache directory
 .npm
 
-
+# Coverage reports
+coverage

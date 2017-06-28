@@ -1,24 +1,66 @@
 var assert = require('assert');
 var stringify = require('../lib/stringify.js');
 
+
+const regexEqual = function(x, y) {
+    return (x instanceof RegExp) && (y instanceof RegExp) && 
+        (x.source === y.source) && (x.global === y.global) && 
+        (x.ignoreCase === y.ignoreCase) && (x.multiline === y.multiline);
+};
+
 describe('lib/stringify.js', function(){
     describe('#stringify(obj, opts)', function(){
         
         describe('primitives', function(){
             var tests = [
-                {type: 'null',      val: null,      output: 'null'},
-                {type: 'undefined', val: undefined, output: 'undefined'},
-                {type: 'string',    val: 'foo',     output: '\'foo\''},
-                {type: 'number',    val: 0,         output: '0'},
-                {type: 'number',    val: 3.14,      output: '3.14'},
-                {type: 'boolean',   val: true,      output: 'true'},
-                {type: 'boolean',   val: false,     output: 'false'},
-                {type: 'RegExp',    val: /'/g,      output: '/\'/g'}
+                {type: 'null',      val: null,      expected: 'null'},
+                {type: 'undefined', val: undefined, expected: 'undefined'},
+                {type: 'string',    val: 'foo',     expected: '\'foo\''},
+                {type: 'number',    val: 0,         expected: '0'},
+                {type: 'number',    val: 3.14,      expected: '3.14'},
+                {type: 'boolean',   val: true,      expected: 'true'},
+                {type: 'boolean',   val: false,     expected: 'false'}
             ];
             tests.forEach(function(test) {
+                let output = stringify(test.val);
                 it(`Correctly stringifies type ${test.type} (${test.val})`, function(){
-                    assert.equal(test.output, stringify(test.val));
+                    assert.equal(test.expected, output);
                 });
+                it(`Stringified ${test.type} ${test.val} evals to the original input`, function(){
+                    assert.equal(test.val, eval(output));
+                });
+            });
+        });
+
+        describe('boxed primitives', function(){
+            var tests = [
+                {type: 'String',    val: new String('foo'),  expected: '\'foo\''},
+                {type: 'Number',    val: new Number(0),      expected: '0'},
+                {type: 'Number',    val: new Number(3.14),   expected: '3.14'},
+                {type: 'Boolean',   val: new Boolean(true),  expected: 'true'},
+                {type: 'Boolean',   val: new Boolean(false), expected: 'false'}
+            ];
+            tests.forEach(function(test) {
+                let output = stringify(test.val);
+                it(`Correctly stringifies wrapper ${test.type} (${test.val})`, function(){
+                    assert.equal(test.expected, output);
+                });
+                it(`Stringified ${test.type} ${test.val} evals to the original primitive`, function(){
+                    assert.equal(test.val.valueOf(), eval(output).valueOf());
+                });
+            });
+        });
+
+        describe('Regular Expressions', function(){
+            let orig = /'/g;
+            let expected = '/\'/g'
+            let output = stringify(orig);
+
+            it(`Correctly stringifies RegExp (${orig})`, function(){
+                assert.equal(expected, output);
+            });
+            it(`Stringified RegExp ${orig} evals to the original Regular Expression`, function(){
+                assert.equal(true, regexEqual(orig, eval(output)));
             });
         });
 

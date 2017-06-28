@@ -112,6 +112,102 @@ module.exports = { greeter };
 ```
 
 
+### Using `module.runProcedure(varName, wrappedFn)` for more creative use cases:
+```js
+const moduleWriter = require('module-writer');
+const outputFilename = __dirname+'/greeter.js';
+
+let newModule = moduleWriter.createModule();
+
+newModule.addVar('supportedLanguages',() => {
+    return {
+        English: {
+            basicGreeting: (name) => `Hello, ${name}.`,
+            friendlyGreeting: (name) => `Yo, ${name}!`
+        },
+        French: {
+            basicGreeting: (name) => `Bonjour, ${name}.`,
+            friendlyGreeting: (name) => `Quoi de neuf, ${name}?`
+        }
+    };
+});
+newModule.addVar('defaultLanguage', ()=> 'English');
+
+newModule.runProcedure('Greeter', (supportedLanguages)=>{
+    class Greeter {
+        constructor(lang){
+            friends = {};
+            this.phrases = supportedLanguages[lang] || supportedLanguages[defaultLang];
+        }
+        greet(nameToGreet){
+            if(friends[friendName]){
+                return this.phrases.friendlyGreeting(nameToGreet);
+            }else{
+                return this.phrases.greeting(nameToGreet);
+            }
+        }
+        makeFriend(friendName){
+            friends[friendName] = true;
+        }
+    }
+    return Greeter;
+});
+
+newModule.addVar('createGreeter', (Greeter)=>{
+    return function(lang){
+        return new Greeter(lang);
+    };
+});
+
+newModule.exportVars(['createGreeter']);
+
+newModule.writeToFile(outputFilename, ()=>{
+    console.log('Success!');
+});
+```
+
+#### Output `greeter.js`:
+```js
+var supportedLanguages = {
+    English: {
+        basicGreeting: (name) => `Hello, ${name}.`,
+        friendlyGreeting: (name) => `Yo, ${name}!`
+    },
+    French: {
+        basicGreeting: (name) => `Bonjour, ${name}.`,
+        friendlyGreeting: (name) => `Quoi de neuf, ${name}?`
+    }
+};
+
+var defaultLanguage = 'English'
+
+var Greeter = (function GreeterProcedure(){
+    class Greeter {
+        constructor(lang){
+            friends = {};
+            this.phrases = supportedLanguages[lang] || supportedLanguages[defaultLang];
+        }
+        greet(nameToGreet){
+            if(friends[friendName]){
+                return this.phrases.friendlyGreeting(nameToGreet);
+            }else{
+                return this.phrases.greeting(nameToGreet);
+            }
+        }
+        makeFriend(friendName){
+            friends[friendName] = true;
+        }
+    }
+    return Greeter;
+})();
+
+var createGreeter = function(lang){
+    return new Greeter(lang);
+};
+
+module.exports = { createGreeter };
+```
+
 ### Specifying options:
 
 You can pass an options object as the last argument to writeModule, createModule, or Module.writeToFile.
@@ -120,7 +216,10 @@ You can pass an options object as the last argument to writeModule, createModule
 Caveats
 -------
 
-* Variables and exports must be either functions, or types which can be expressed literally.  Those types are primitives (strings, chars, numbers, symbols, booleans, regular expressions, null, undefined), boxed primitives (Number, Boolean, etc), literal objects, Arrays with numeric keys.  *However, these objects can be nested, and functions can return any type on the module's scope.*
+* Variables must be either functions, or types which can be expressed literally.  Those types are primitives (strings, chars, numbers, symbols, booleans, regular expressions, null, undefined), boxed primitives (Number, Boolean, etc), literal objects, Arrays with numeric keys.  *However, these objects can be nested, and functions can return any type on the module's scope.*
+
+* Functions and variables passed into the module must not reference anything which will resolve to `undefined` in the module's scope.  (Just remember that your code will run in a different context!)
+
 * This package only works in Node.js, not browsers.
 
 

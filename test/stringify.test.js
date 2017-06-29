@@ -9,6 +9,11 @@ const regexEqual = function(x, y) {
         (x.source === y.source) && (x.global === y.global) && 
         (x.ignoreCase === y.ignoreCase) && (x.multiline === y.multiline);
 };
+
+//Default line endings
+const rn = stringify.defaultOpts.lineBreak;
+const rnt = stringify.defaultOpts.lineBreak+stringify.defaultOpts.indent;
+
 let testFnNoLeadingSpaces = function(){
     return foo;
 };
@@ -80,16 +85,16 @@ describe('lib/stringify.js', function(){
                         else return -1;
                     },
                     expected: 'function (a, b){'+
-                        '\r\n    if(a > b) return 1;'+
-                        '\r\n    else if(a === b) return 0;'+
-                        '\r\n    else return -1;'+
-                        '\r\n}'
+                        `${rn}    if(a > b) return 1;`+
+                        `${rn}    else if(a === b) return 0;`+
+                        `${rn}    else return -1;`+
+                        `${rn}}`
                 },
                 fnNoSpaces: {
                     orig: testFnNoLeadingSpaces,
                     expected: 'function (){'+
-                        '\r\n    return foo;'+
-                        '\r\n}'
+                        `${rn}    return foo;`+
+                        `${rn}}`
                 },
                 arrowFn: {
                     orig: foo => { 'bar' },
@@ -100,14 +105,26 @@ describe('lib/stringify.js', function(){
                         return 'baz';
                     },
                     expected: '(foo, bar) => {'+
-                        '\r\n    return \'baz\';'+
-                        '\r\n}'
+                        `${rn}    return \'baz\';`+
+                        `${rn}}`
+                },
+                generatorFn: {
+                    orig: function* idMaker() {
+                        var index = 0;
+                        while (index < 3)
+                            yield index++;
+                    },
+                    expected: 'function* idMaker() {'+
+                        `${rn}    var index = 0;`+
+                        `${rn}    while (index < 3)`+
+                        `${rn}        yield index++;`+
+                        `${rn}}`
                 }
             };
-            testCases.simpleFn.output = stringify(testCases.simpleFn.orig);
-            testCases.fnNoSpaces.output = stringify(testCases.fnNoSpaces.orig);
-            testCases.arrowFn.output = stringify(testCases.arrowFn.orig);
-            testCases.arrowFnLong.output = stringify(testCases.arrowFnLong.orig);
+            Object.keys(testCases).forEach(testName => {
+                testCases[testName].output = stringify(testCases[testName].orig);
+            });
+            
             it('Correctly stringifies functions', function(){
                 assert.equal(testCases.simpleFn.output, testCases.simpleFn.expected);
             });
@@ -122,6 +139,9 @@ describe('lib/stringify.js', function(){
             });
             it('Correctly stringifies ES6 long arrow functions', function(){
                 assert.equal(testCases.arrowFnLong.output, testCases.arrowFnLong.expected);
+            });
+            it('Correctly stringifies ES6 generator functions', function(){
+                assert.equal(testCases.generatorFn.output, testCases.generatorFn.expected);
             });
         });
 
@@ -144,10 +164,10 @@ describe('lib/stringify.js', function(){
                     RegExpProp: /^"[a-zA-Z_][a-zA-Z_0-9]*"$/
                 };
                 let expected = '{' +
-                    `\r\n\tstringProp: 'What a long string this is!  Especially if it keeps going...',`+
-                    `\r\n\tnumProp: 1234567890,`+
-                    `\r\n\tRegExpProp: /^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
-                '\r\n}';
+                    `${rnt}stringProp: 'What a long string this is!  Especially if it keeps going...',`+
+                    `${rnt}numProp: 1234567890,`+
+                    `${rnt}RegExpProp: /^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
+                `${rn}}`;
                 assert.equal(stringify(orig), expected);
             });
         });
@@ -167,16 +187,16 @@ describe('lib/stringify.js', function(){
                     /^"[a-zA-Z_][a-zA-Z_0-9]*"$/
                 ];
                 let expected = '[' +
-                    `\r\n\t'What a long string this is!  Especially if it keeps going...',`+
-                    `\r\n\t1234567890,`+
-                    `\r\n\t/^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
-                '\r\n]';
+                    `${rnt}'What a long string this is!  Especially if it keeps going...',`+
+                    `${rnt}1234567890,`+
+                    `${rnt}/^"[a-zA-Z_][a-zA-Z_0-9]*"$/`+
+                `${rn}]`;
                 assert.equal(stringify(orig), expected);
             });
         });
 
         describe('Complex objects', function(){
-
+            
         });
     });
 });

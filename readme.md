@@ -13,7 +13,7 @@ Node.js: Module-writer
 What can I do with this?
 ---
 
-* Generate Node or UMD modules as part of a build script
+* Generate Node (CJS) modules as part of a build script
 * Store data which contains functions
 * Write your own CLI tool
 
@@ -55,10 +55,7 @@ module.exports = {
 };
 ```
 
-Advanced Usage
---------------
-
-### Using `createModule()` and `Module` methods to compose more advanced modules:
+### Using `createModule()` and `Module` methods to compose more complex modules:
 
 ```js
 const moduleWriter = require('module-writer');
@@ -114,7 +111,11 @@ module.exports = { greeter };
 ```
 
 
-### Using `module.runProcedure(varName, wrappedFn)` for more creative use cases:
+Advanced Usage
+--------------
+
+
+### Using `Module.addVarProcedure(varName, wrappedFn)` for more creative use cases:
 ```js
 const moduleWriter = require('module-writer');
 const outputFilename = __dirname+'/greeter.js';
@@ -135,7 +136,7 @@ newModule.addVar('supportedLanguages',() => {
 });
 newModule.addVar('defaultLanguage', ()=> 'English');
 
-newModule.runProcedure('Greeter', (supportedLanguages)=>{
+newModule.addVarProcedure('Greeter', (supportedLanguages, defaultLang) => () => {
     class Greeter {
         constructor(lang){
             friends = {};
@@ -183,7 +184,7 @@ var supportedLanguages = {
 
 var defaultLanguage = 'English'
 
-var Greeter = (function GreeterProcedure(){
+var Greeter = (() => {
     class Greeter {
         constructor(lang){
             friends = {};
@@ -209,6 +210,130 @@ var createGreeter = function(lang){
 
 module.exports = { createGreeter };
 ```
+
+
+### Express an entire module as a function with `writeToModule(function, filename, callback)`:
+
+```js
+const moduleWriter = require('module-writer');
+const outputFilename = __dirname+'/greeter.js';
+
+moduleWriter.writeModule(function(){
+    const _ = require('lodash');
+    var favoritePeople = ['Fred', 'George'];
+    
+    var greeter = function(nameToGreet){
+        if( _.includes(favoritePeople, nameToGreet) ){
+            return 'Hello, '+nameToGreet', my friend!';
+        }else{
+            return 'Hello, '+nameToGreet;
+        }
+    };
+
+    module.exports = { greeter };
+}, outputFilename, ()=>{
+    console.log('Success!');
+})
+```
+
+#### Output `greeter.js`:
+```js
+const _ = require('lodash');
+var favoritePeople = ['Fred', 'George'];
+
+var greeter = function(nameToGreet){
+    if( _.includes(favoritePeople, nameToGreet) ){
+        return 'Hello, '+nameToGreet', my friend!';
+    }else{
+        return 'Hello, '+nameToGreet;
+    }
+};
+
+module.exports = { greeter };
+```
+
+### Add arbitrary code to a module with `Module.runProcedure(function)`:
+```js
+const moduleWriter = require('module-writer');
+const outputFilename = __dirname+'/greeter.js';
+
+let newModule = moduleWriter.createModule();
+
+newModule.addVar('supportedLanguages',() => {
+    return {
+        English: {
+            basicGreeting: (name) => `Hello, ${name}.`,
+            friendlyGreeting: (name) => `Yo, ${name}!`
+        },
+        French: {
+            basicGreeting: (name) => `Bonjour, ${name}.`,
+            friendlyGreeting: (name) => `Quoi de neuf, ${name}?`
+        }
+    };
+});
+newModule.addVar('defaultLanguage', ()=> 'English');
+
+newModule.runProcedure((supportedLanguages) => () => {
+    class Greeter {
+        constructor(lang){
+            friends = {};
+            this.phrases = supportedLanguages[lang] || supportedLanguages[defaultLang];
+        }
+        greet(nameToGreet){
+            if(friends[friendName]){
+                return this.phrases.friendlyGreeting(nameToGreet);
+            }else{
+                return this.phrases.greeting(nameToGreet);
+            }
+        }
+        makeFriend(friendName){
+            friends[friendName] = true;
+        }
+    }
+
+    module.exports = Greeter;
+});
+
+newModule.writeToFile(outputFilename, ()=>{
+    console.log('Success!');
+});
+```
+
+#### Output `greeter.js`:
+```js
+var supportedLanguages = {
+    English: {
+        basicGreeting: (name) => `Hello, ${name}.`,
+        friendlyGreeting: (name) => `Yo, ${name}!`
+    },
+    French: {
+        basicGreeting: (name) => `Bonjour, ${name}.`,
+        friendlyGreeting: (name) => `Quoi de neuf, ${name}?`
+    }
+};
+
+var defaultLanguage = 'English'
+
+class Greeter {
+    constructor(lang){
+        friends = {};
+        this.phrases = supportedLanguages[lang] || supportedLanguages[defaultLang];
+    }
+    greet(nameToGreet){
+        if(friends[friendName]){
+            return this.phrases.friendlyGreeting(nameToGreet);
+        }else{
+            return this.phrases.greeting(nameToGreet);
+        }
+    }
+    makeFriend(friendName){
+        friends[friendName] = true;
+    }
+}
+
+module.exports = Greeter;
+```
+
 
 ### Specifying options:
 

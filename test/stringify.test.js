@@ -23,6 +23,10 @@ let testFnNoLeadingSpaces = function(){
 describe('lib/stringify.js', function(){
     describe('#stringify(obj, opts)', function(){
         
+        it('Should be a function', function(){
+            assert.equal(typeof stringify, 'function');
+        });
+
         describe('primitives', function(){
             var tests = [
                 {type: 'null',      val: null,      expected: 'null'},

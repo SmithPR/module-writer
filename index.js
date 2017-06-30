@@ -1,6 +1,6 @@
 const fs = require('fs');
-const util = require('util');
-const _ = require('lodash');
+const constants = require('./lib/constants.js');
+const compose = require('./lib/moduleComposer.js');
 
 /**
  * Writes a module containing the object passed in, which can include functions as properties.
@@ -10,52 +10,44 @@ const _ = require('lodash');
  * @param {*} options 
  */
 let writeModule = function(object, filename, callback, options){
-    console.log('Preparing data for serialization...')
-    let maxDepth = 25;
-    let prepObject = function(obj, depth){
-        let newObj;
-        let nextDepth = depth+1;
-
-        if (typeof obj !== 'object' || Array.isArray(obj)){
-            return obj;
-        }
-        if(depth > maxDepth){
-            console.error('Max depth exceeded!');
-            return obj;
-        }
-
-        newObj = {};
-        _.forIn((obj), (prop, key)=>{
-            if(typeof prop === 'function'){
-                prop.inspect = prop.toString;
-            }else if(typeof prop === 'object'){
-                prop = prepObject(prop, nextDepth);
-            }
-            newObj[key] = prop;
-        });
-        return newObj;
+    let objCO = {
+        type: constants.contentTypes.var,
+        varName: 'exportsObject',
+        payload: object
     };
-    object = prepObject(object, 0);
-    console.log('Serializing data...')
-    let fileContents = `
-const moduleData = ${util.inspect(object, { depth:25, maxArrayLength: null })};
-module.exports = moduleData;
-    `;
-    console.log('Writing data to file...');
-    fs.writeFile(filename, fileContents, callback);
+    let exportCO = {
+        type: 'procedure',
+        payload: (function(exportsObject){
+            return function(){
+                module.exports = exportsObject;
+            };
+        })()
+    };
+    let moduleString = compose([], [objCO, exportCO], []);
+    
+    fs.writeFile(filename, moduleString, callback);
 };
 
 class Module {
     constructor(opts){
-        this.options = opts;
-        this.requires = [];
-        this.vars = [];
+        this.opts = opts;
+        this._imports = [];
+        this._contents = [];
+        this._exports = [];
     }
     require(varName, importLoc){
-        this.requires.push([varName, importLoc]);
+        this._imports.push({
+            varName: varName,
+            importLoc: importLoc
+        });
     }
     addVar(varName, expr){
-
+        if(typeof varName === 'string' && typeof expr === 'function'){
+            this._contents.push({
+                type: constants.contentTypes.var,
+                payload: expr()
+            });
+        }
     }
     exportVars(vars){
 

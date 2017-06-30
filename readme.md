@@ -273,7 +273,7 @@ newModule.addVar('supportedLanguages',() => {
 });
 newModule.addVar('defaultLanguage', ()=> 'English');
 
-newModule.runProcedure((supportedLanguages) => () => {
+newModule.runProcedure((supportedLanguages, defaultLang) => () => {
     class Greeter {
         constructor(lang){
             friends = {};

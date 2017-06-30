@@ -13,6 +13,7 @@ const regexEqual = function(x, y) {
 //Default line endings
 const rn = stringify.defaultOpts.lineBreak;
 const rnt = stringify.defaultOpts.lineBreak+stringify.defaultOpts.indent;
+const t = stringify.defaultOpts.indent;
 
 let testFnNoLeadingSpaces = function(){
     return foo;
@@ -196,7 +197,54 @@ describe('lib/stringify.js', function(){
         });
 
         describe('Complex objects', function(){
+            let testCases = {
+                complexObject: {
+                    orig: {
+                        shortArr: [ 1, 2, 3 ],
+                        longArr: [
+                            function weirdFn(foo){
+                                if(typeof foo === 'string'){
+                                    if(foo === 'foo'){
+                                        return foo;
+                                    }else{
+                                        return 'bar';
+                                    }
+                                }
+                                return function(){
+                                    return null;
+                                };
+                            },
+                            { nestedArr: [], nestedObj: {} }
+                        ]
+                    },
+                    expected: '{'+
+                        `${rnt}shortArr: [ 1, 2, 3 ],`+
+                        `${rnt}longArr: [`+
+                        `${rnt+t}function weirdFn(foo){`+
+                        `${rnt+t}    if(typeof foo === 'string'){`+
+                        `${rnt+t}        if(foo === 'foo'){`+
+                        `${rnt+t}            return foo;`+
+                        `${rnt+t}        }else{`+
+                        `${rnt+t}            return 'bar';`+
+                        `${rnt+t}        }`+
+                        `${rnt+t}    }`+
+                        `${rnt+t}    return function(){`+
+                        `${rnt+t}        return null;`+
+                        `${rnt+t}    };`+
+                        `${rnt+t}},`+
+                        `${rnt+t}{ nestedArr: [], nestedObj: {} }`+
+                        `${rnt}]`+
+                        `${rn}}`
+                }
+            };
             
+            Object.keys(testCases).forEach(testName => {
+                testCases[testName].output = stringify(testCases[testName].orig);
+            });
+
+            it('Correctly stringifies combinations of objects, arrays, and functions', function(){
+                assert.equal(testCases.complexObject.output, testCases.complexObject.expected);
+            });
         });
     });
 });

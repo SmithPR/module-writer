@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var stringify = require('../lib/stringify.js');
+var defaultOpts = require('../lib/defaultOpts.js');
 
 
 const regexEqual = function(x, y) {
@@ -11,9 +12,9 @@ const regexEqual = function(x, y) {
 };
 
 //Default line endings
-const rn = stringify.defaultOpts.lineBreak;
-const rnt = stringify.defaultOpts.lineBreak+stringify.defaultOpts.indent;
-const t = stringify.defaultOpts.indent;
+const rn = defaultOpts.lineBreak;
+const t = defaultOpts.indent;
+const rnt = rn+t;
 
 let testFnNoLeadingSpaces = function(){
     return foo;

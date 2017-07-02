@@ -212,13 +212,13 @@ module.exports = { createGreeter };
 ```
 
 
-### Express an entire module as a function with `writeToModule(function, filename, callback)`:
+### Express an entire module as a function with `writeModuleFn(function, filename, callback)`:
 
 ```js
 const moduleWriter = require('module-writer');
 const outputFilename = __dirname+'/greeter.js';
 
-moduleWriter.writeModule(function(){
+moduleWriter.writeModuleFn(function(){
     const _ = require('lodash');
     var favoritePeople = ['Fred', 'George'];
     

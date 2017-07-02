@@ -2,9 +2,8 @@
 
 var assert = require('assert');
 var compose = require('../lib/moduleComposer.js');
-var stringify = require('../lib/stringify.js');
 var defaultOpts = require('../lib/defaultOpts.js');
-var constants = require('../lib/constants.js');
+var contentTypes = require('../lib/contentTypes.js');
 
 
 //Default line endings
@@ -37,53 +36,35 @@ describe('lib/moduleComposer.js', function(){
             },
             contents: {
                 'functions as variables': {
-                    orig: {
-                        type: constants.contentTypes.var,
-                        varName: 'scopeFn',
-                        payload: function (){
-                            return 0;
-                        }
-                    },
+                    orig: new contentTypes.CVar('scopeFn', function (){
+                        return 0;
+                    }),
                     expected: 'var scopeFn = function (){'+
                         `${rn}    return 0;`+
                         `${rn}};`
                 },
                 'objects as variables': {
-                    orig: {
-                        type: constants.contentTypes.var,
-                        varName: 'scopeObj',
-                        payload: { a: 1, b: 2 }
-                    },
+                    orig: new contentTypes.CVar('scopeObj', { a: 1, b: 2 }),
                     expected: 'var scopeObj = { a: 1, b: 2 };'
                 },
                 'expression results as variables': {
-                    orig: {
-                        type: constants.contentTypes.varExpression,
-                        varName: 'exprResult',
-                        payload: function (){
-                            return 2+2;
-                        }
-                    },
+                    orig: new contentTypes.CVarExpression('exprResult', function (){
+                        return 2+2;
+                    }),
                     expected: 'var exprResult = (function (){'+
                         `${rn}    return 2+2;`+
                         `${rn}})();`
                 },
                 'arbitrary code as standard functions': {
-                    orig: {
-                        type: constants.contentTypes.procedure,
-                        payload: function (){
-                            let ten = 20 / 2;
-                            let two = 20 / ten;
-                        }
-                    },
+                    orig: new contentTypes.CProcedure(function(){
+                        let ten = 20 / 2;
+                        let two = 20 / ten;
+                    }),
                     expected: 'let ten = 20 / 2;'+
                         `${rn}let two = 20 / ten;`
                 },
                 'arbitrary code as arrow functions': {
-                    orig: {
-                        type: constants.contentTypes.procedure,
-                        payload: () => scopeFn()
-                    },
+                    orig: new contentTypes.CProcedure(() => scopeFn()),
                     expected: 'scopeFn();'
                 }
             }

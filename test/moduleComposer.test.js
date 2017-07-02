@@ -87,13 +87,38 @@ describe('lib/moduleComposer.js', function(){
                     expected: 'scopeFn();'
                 }
             }
+        };
+        var combinationTests = {
+            imports: {
+                orig: [testStatements.imports.npm.orig, testStatements.imports.path.orig],
+                expected: testStatements.imports.npm.expected+
+                    rn+testStatements.imports.path.expected
+            },
+            _exports: {
+                orig: [testStatements._exports.string.orig, testStatements._exports.Array.orig],
+                expected: 'module.exports = { foo, bar, baz };'
+            },
+            contents: {
+                orig: [],
+                expected: ''
+            }
         }
+        Object.keys(testStatements.contents).forEach(function(testKey, index){
+            combinationTests.contents.orig.push(testStatements.contents[testKey].orig);
+            if(index !== 0){
+                combinationTests.contents.expected += (rn+rn);
+            }
+            combinationTests.contents.expected += testStatements.contents[testKey].expected;
+        });
+
+
         it('Should be a function', function(){
             assert.equal(typeof compose, 'function');
         });
 
         describe('imports', function(){
             let tests = testStatements.imports;
+            let combinedTest = combinationTests.imports;
 
             Object.keys(tests).forEach(function(importType){
                 it(`Should return correct statements for ${importType} imports`, function(){
@@ -103,12 +128,12 @@ describe('lib/moduleComposer.js', function(){
             });
 
             it('Should handle multiple import statements', function(){
-                let expected = tests.npm.expected+rn+tests.path.expected;
-                assert.equal(compose([tests.npm.orig, tests.path.orig], [], []), expected);
+                assert.equal(compose(combinedTest.orig, [], []), combinedTest.expected);
             });
         });
         describe('exports', function(){
             let tests = testStatements._exports;
+            let combinedTest = combinationTests._exports;
 
             Object.keys(tests).forEach(function(exportType){
                 it(`Should return correct statements for ${exportType} exports`, function(){
@@ -118,13 +143,12 @@ describe('lib/moduleComposer.js', function(){
             });
 
             it('Should handle multiple exports', function(){
-                let expected = 'module.exports = { foo, bar, baz };';
-                assert.equal(compose([], [tests.string.orig, tests.Array.orig], []), expected);
+                assert.equal(compose([], combinedTest.orig, []), combinedTest.expected);
             });
         });
         describe('contents', function(){
-
             let tests = testStatements.contents;
+            let combinedTest = combinationTests.contents;
 
             Object.keys(tests).forEach(function(content){
                 it(`Should return correct statements for ${content}`, function(){
@@ -132,12 +156,21 @@ describe('lib/moduleComposer.js', function(){
                     assert.equal(compose([], [], [testCase.orig]), testCase.expected);
                 });
             });
+            it('Should handle multiple content statements', function(){
+                assert.equal(compose([], [], combinedTest.orig), combinedTest.expected);
+            });
 
         });
 
-        // it('Should correctly compose all statements', function(){
-
-        // });
+        it('Should correctly compose all statements', function(){
+            let expected = combinationTests.imports.expected+
+                rn+rn+combinationTests.contents.expected+
+                rn+rn+combinationTests._exports.expected;
+            let output = compose( combinationTests.imports.orig,
+                combinationTests._exports.orig,
+                combinationTests.contents.orig );
+            assert.equal(output, expected);
+        });
 
         
 

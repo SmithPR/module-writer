@@ -1,5 +1,5 @@
 const fs = require('fs');
-const contentTypes = require('./lib/contentTypes.js');
+const contentTypes = require('./lib/util/contentTypes.js');
 const compose = require('./lib/moduleComposer.js');
 const Module = require('./lib/Module');
 

@@ -2,8 +2,8 @@
 
 var assert = require('assert');
 var compose = require('../lib/moduleComposer.js');
-var defaultOpts = require('../lib/defaultOpts.js');
-var contentTypes = require('../lib/contentTypes.js');
+var defaultOpts = require('../lib/util/defaultOpts.js');
+var contentTypes = require('../lib/util/contentTypes.js');
 
 
 //Default line endings

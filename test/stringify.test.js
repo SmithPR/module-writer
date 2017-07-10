@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var stringify = require('../lib/stringify.js');
-var defaultOpts = require('../lib/defaultOpts.js');
+var defaultOpts = require('../lib/util/defaultOpts.js');
 
 
 const regexEqual = function(x, y) {

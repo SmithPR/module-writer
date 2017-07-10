@@ -2,7 +2,8 @@
 
 var assert = require('assert');
 var Module = require('../lib/Module.js');
-var contentTypes = require('../lib/contentTypes.js');
+var compose = require('../lib/moduleComposer.js');
+var contentTypes = require('../lib/util/contentTypes.js');
 
 describe('lib/Module.js', function(){
     describe('Module class', function(){
@@ -34,7 +35,7 @@ describe('lib/Module.js', function(){
 
             });
             it('Should still work without arguments', function(){
-                
+
             });
         });
     });
